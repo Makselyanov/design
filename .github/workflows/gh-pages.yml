@@ -26,8 +26,11 @@ jobs:
           mv design_part08.part design_archive_split10.z08
           mv design_part09.part design_archive_split10.z09
           mv design_part10.part design_archive_split10.z10
+      - name: Combine split parts
+        run: |
+          cat design_archive_split10.z* design_archive_split10.zip > design_complete.zip
       - name: Extract site
-        run: unzip -o design_archive_split10.zip -d site
+        run: unzip -o design_complete.zip -d site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./site/public_html
