@@ -1,0 +1,51 @@
+name: Deploy design site UTF-8
+on:
+  push:
+    branches: ["main"]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: design-pages-utf
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install 7zip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
+      - name: Rename split parts
+        run: |
+          mv design_part01.part design_archive_split10.z01
+          mv design_part02.part design_archive_split10.z02
+          mv design_part03.part design_archive_split10.z03
+          mv design_part04.part design_archive_split10.z04
+          mv design_part05.part design_archive_split10.z05
+          mv design_part06.part design_archive_split10.z06
+          mv design_part07.part design_archive_split10.z07
+          mv design_part08.part design_archive_split10.z08
+          mv design_part09.part design_archive_split10.z09
+          mv design_part10.part design_archive_split10.z10
+      - name: Extract archive
+        run: |
+          7z x -y design_archive_split10.zip
+          zipfile=$(ls -1 *.zip | grep -v '^design_archive_split10.zip$' | head -n 1)
+          7z x -y "$zipfile" -osite
+      - name: Fix encoding to UTF-8
+        run: |
+          find ./site/public_html -type f -name "*.html" -print0 | while IFS= read -r -d '' file; do
+            sed -i 's/<meta charset=[^>]*>/<meta charset="utf-8">/I' "$file"
+          done
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site/public_html
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
