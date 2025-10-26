@@ -26,12 +26,14 @@ jobs:
           mv design_part08.part design_archive_split10.z08
           mv design_part09.part design_archive_split10.z09
           mv design_part10.part design_archive_split10.z10
-      - name: Combine archive
-        run: zip -s 0 design_archive_split10.zip --out design_complete.zip
+      - name: Install 7zip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
       - name: Extract site
         run: |
-          unzip -o design_complete.zip
-          unzip -o archive_2060_0918.zip -d site
+          7z x -y design_archive_split10.zip
+          7z x -y archive_2060_0918.zip -osite
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./site/public_html
