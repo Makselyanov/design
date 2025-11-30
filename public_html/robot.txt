@@ -1,0 +1,2 @@
+User-agent: *
+Host: https://design.centrlp.ru
